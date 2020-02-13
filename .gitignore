@@ -1,0 +1,6 @@
+.idea
+.DS_Store
+!.gitkeep
+/docker/nginx/sites/*
+!/docker/nginx/sites/local.conf
+/logs/**/*.log

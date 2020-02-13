@@ -1,0 +1,87 @@
+version: "3"
+
+networks:
+  ibd:
+    driver: bridge
+
+services:
+  webserver:
+    build:
+      context: ${BASE_PATH}/docker/nginx
+    image: ibd-webserver
+    container_name: ibd-webserver
+    networks:
+      - ibd
+    ports:
+      - ${HOST_PORT_WEBSERVER}:80
+      - ${HOST_PORT_WEBSERVER_SSL}:443
+    volumes:
+      - ${BASE_PATH}/www:/var/www/html
+      - ${BASE_PATH}/logs/webserver:/var/log/nginx:rw${MOUNT_OPTIONS}
+    depends_on:
+      - php7
+
+  php7:
+    build:
+      context: ${BASE_PATH}/docker/php
+    image: ibd-php7
+    container_name: ibd-php7
+    networks:
+      - ibd
+    environment:
+      TZ: ${TIMEZONE}
+    volumes:
+      - ${BASE_PATH}/www:/var/www/html
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    container_name: ibd-mysql
+    networks:
+      - ibd
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_DEFAULT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DEFAULT_DB}
+      MYSQL_USER: ${MYSQL_DEFAULT_USER}
+      MYSQL_PASSWORD: ${MYSQL_DEFAULT_PASSWORD}
+    ports:
+      - ${HOST_PORT_MYSQL}:3306
+    volumes:
+      - ${BASE_PATH}/docker/mysql/local.conf:/etc/mysql/conf.d/local.cnf
+      - ${BASE_PATH}/logs/mysql:/var/log/mysql:rw${MOUNT_OPTIONS}
+      - mysql-data:/var/lib/mysql
+ 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: ibd-phpmyadmin
+    networks:
+      - ibd
+    depends_on:
+      - php7
+      - mysql
+    ports:
+        - ${HOST_PORT_PHPMYADMIN}:${HOST_PORT_WEBSERVER}
+    environment:
+      MYSQL_USERNAME: ${MYSQL_DEFAULT_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_DEFAULT_PASSWORD}
+      PMA_HOST: mysql
+      PMA_PORT: ${HOST_PORT_MYSQL}
+
+  redis:
+    image: redis:5.0
+    container_name: ibd-redis
+    networks:
+      - ibd
+    ports:
+      - ${HOST_PORT_REDIS}:6379
+    restart: on-failure
+    command: redis-server --appendonly yes
+    volumes:
+      - ${BASE_PATH}/logs/redis:/var/log/redis:rw${MOUNT_OPTIONS}
+      - redis-data:/data
+volumes:
+    mysql-data:
+      driver: "local" 
+    redis-data:
+      driver: "local"
