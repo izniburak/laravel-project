@@ -21,6 +21,15 @@ class Category extends Model
     public $timestamps = true;
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'id',
+    ];
+
+    /**
      * Get the songs for the category
      */
     public function songs()

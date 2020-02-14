@@ -18,7 +18,7 @@ class CreateCategoriesTable extends Migration
             $table->uuid('uuid');
             $table->string('name', 50);
             $table->string('description', 150);
-            $table->string('image', 255);
+            $table->string('image', 255)->nullable();
             $table->enum('status', [0, 1]);
             $table->timestamps();
 
