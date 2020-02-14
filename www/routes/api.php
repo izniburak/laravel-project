@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::apiResource('users', 'UserController');
 Route::prefix('users')->group(function () {
-    Route::get('{id}/favorites', 'UserController@favorites');
+    Route::get('{song}/favorites', 'UserController@favorites');
 });
 Route::apiResource('categories', 'CategoryController');
 Route::apiResource('songs', 'SongController');
 Route::prefix('songs')->group(function () {
-    Route::post('{id}/favorites', 'SongController@storeFavorites');
-    Route::delete('{id}/favorites', 'SongController@deleteFavorites');
+    Route::post('{song}/favorite', 'SongController@storeFavorites');
+    Route::delete('{song}/favorite', 'SongController@deleteFavorites');
 });
 

@@ -59,10 +59,14 @@ class Handler extends ExceptionHandler
                 'error' => [
                     'code' => $exception->getCode(),
                     'message' => $exception->getMessage(),
-                    'errors' => is_array($exception->errors())
-                        ? array_column(array_values($exception->errors()), 0) : $exception->errors(),
                 ],
             ];
+
+            if (method_exists($exception, 'errors')) {
+                $response['error']['errors'] = is_array($exception->errors())
+                    ? array_column(array_values($exception->errors()), 0)
+                    : $exception->errors();
+            }
 
             // If the app is in debug mode
             if (config('app.debug')) {
