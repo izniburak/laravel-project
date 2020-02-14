@@ -30,10 +30,27 @@ class Category extends Model
     ];
 
     /**
+     * The attributes that should be append for arrays.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'song_count'
+    ];
+
+    /**
      * Get the songs for the category
      */
     public function songs()
     {
         return $this->hasMany('App\Song');
+    }
+
+    /**
+     * @return int
+     */
+    public function getSongCountAttribute()
+    {
+        return $this->songs()->count();
     }
 }

@@ -38,10 +38,27 @@ class User extends Authenticatable
     ];
 
     /**
+     * The attributes that should be append for arrays.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'favorite_count'
+    ];
+
+    /**
      * Get the favorites for the user.
      */
     public function favorites()
     {
         return $this->hasMany('App\Favorite');
+    }
+
+    /**
+     * @return int
+     */
+    public function getFavoriteCountAttribute()
+    {
+        return $this->favorites()->count();
     }
 }

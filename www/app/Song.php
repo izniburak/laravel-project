@@ -66,6 +66,9 @@ class Song extends Model
         $this->attributes['category_id'] = $category->id;
     }
 
+    /**
+     * @return int
+     */
     public function getFavoriteCountAttribute()
     {
         return $this->favorites()->count();
