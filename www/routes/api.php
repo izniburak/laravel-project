@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,6 +14,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::apiResource('users', 'UserController');
+Route::prefix('users')->group(function () {
+    Route::get('{id}/favorites', 'UserController@favorites');
+});
 Route::apiResource('categories', 'CategoryController');
 Route::apiResource('songs', 'SongController');
+Route::prefix('songs')->group(function () {
+    Route::get('{id}/favorites', 'SongController@favorites');
+    Route::post('{id}/favorites', 'SongController@storeFavorites');
+    Route::delete('{id}/favorites', 'SongController@deleteFavorites');
+});
 

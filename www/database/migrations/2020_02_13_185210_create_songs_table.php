@@ -20,7 +20,7 @@ class CreateSongsTable extends Migration
             $table->string('name', 50);
             $table->string('album', 100);
             $table->string('artist', 50);
-            $table->string('image', 255);
+            $table->string('image', 255)->nullable();
             $table->string('source', 255);
             $table->enum('status', [0, 1]);
             $table->timestamps();
