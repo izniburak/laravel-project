@@ -6,7 +6,6 @@ use App\Category;
 use App\Http\Requests\CategoryRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CategoryController extends Controller
 {
@@ -31,13 +30,9 @@ class CategoryController extends Controller
     public function store(CategoryRequest $request)
     {
         $data = $request->validated();
-
         $category = new Category();
         $category->uuid = Str::uuid();
-        $category->name = $data['name'];
-        $category->description = $data['description'];
-        $category->image = $data['image'] ?? null;
-        $category->status = $data['status'] ?? '1';
+        $this->fillData($category, $data, 'store');
         $category->save();
 
         return $this->apiResponse($category, Response::HTTP_CREATED);
@@ -67,13 +62,9 @@ class CategoryController extends Controller
      */
     public function update(CategoryRequest $request, $id)
     {
-        $category = $this->getCategory($id);
         $data = $request->validated();
-
-        $category->name = $data['name'];
-        $category->description = $data['description'];
-        $category->image = isset($data['image']) && !empty($data['status']) ? $data['image'] : $category->image;
-        $category->status = isset($data['status']) && !empty($data['status']) ? $data['status'] : $category->status;
+        $category = $this->getCategory($id);
+        $this->fillData($category, $data, 'update');
         $category->save();
 
         return $this->apiResponse($category, Response::HTTP_OK);
@@ -102,13 +93,25 @@ class CategoryController extends Controller
      */
     private function getCategory($id)
     {
-        try {
-            return Category::whereUuid($id)->firstOrFail();
-        } catch (NotFoundHttpException $e) {
-            return $this->apiResponse(
-                $this->errorResponse(1001, 'Category not found'),
-                Response::HTTP_NOT_FOUND
-            );
-        }
+        return Category::whereUuid($id)->firstOrFail();
+    }
+
+    /**
+     * @param Category $model
+     * @param array $data
+     * @param string $action
+     *
+     * @return void
+     */
+    private function fillData(&$model, $data, $action)
+    {
+        $model->name = $data['name'];
+        $model->description = $data['description'];
+        $model->image = isset($data['image']) && !empty($data['image'])
+            ? $data['image']
+            : ($action === 'store' ? null : $model->image);
+        $model->status = isset($data['status']) && !empty($data['status'])
+            ? $data['status']
+            : ($action === 'store' ? '1' : $model->status);
     }
 }

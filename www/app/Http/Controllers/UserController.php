@@ -6,7 +6,6 @@ use App\Http\Requests\UserRequest;
 use App\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserController extends Controller
 {
@@ -33,11 +32,9 @@ class UserController extends Controller
         $data = $request->validated();
         $user = new User;
         $user->uuid = Str::uuid();
-        $user->name = $data['name'];
-        $user->email = $data['email'];
-        $user->password = bcrypt($data['password']);
+        $this->fillData($user, $data);
         $user->save();
-        return $this->apiResponse([], Response::HTTP_OK);
+        return $this->apiResponse($user, Response::HTTP_CREATED);
     }
 
     /**
@@ -64,11 +61,9 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, $id)
     {
-        $user = $this->getUser($id);
         $data = $request->validated();
-        $user->name = $data['name'];
-        $user->email = $data['email'];
-        $user->password = bcrypt($data['password']);
+        $user = $this->getUser($id);
+        $this->fillData($user, $data);
         $user->save();
 
         return $this->apiResponse($user, Response::HTTP_OK);
@@ -84,10 +79,28 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = $this->getUser($id);
+        $response = $user = $this->getUser($id);
         $user->delete();
 
-        return $this->apiResponse($user, Response::HTTP_OK);
+        return $this->apiResponse($response, Response::HTTP_OK);
+    }
+
+    /**
+     * @param $id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function favorites($id)
+    {
+        $user = $this->getUser($id);
+        $favorites = $user->favorites()->get();
+
+        $list = [];
+        foreach ($favorites as $favorite) {
+            $list[] = $favorite->song;
+        }
+
+        return $this->apiResponse($list, Response::HTTP_OK);
     }
 
     /**
@@ -97,13 +110,17 @@ class UserController extends Controller
      */
     private function getUser($id)
     {
-        try {
-            return User::whereUuid($id)->firstOrFail();
-        } catch (NotFoundHttpException $e) {
-            return $this->apiResponse(
-                $this->errorResponse(1001, 'User not found'),
-                Response::HTTP_NOT_FOUND
-            );
-        }
+        return User::whereUuid($id)->firstOrFail();
+    }
+
+    /**
+     * @param User $model
+     * @param array $data
+     */
+    private function fillData(&$model, $data)
+    {
+        $model->name = $data['name'];
+        $model->email = $data['email'];
+        $model->password = bcrypt($data['password']);
     }
 }
