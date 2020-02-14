@@ -21,6 +21,15 @@ class Favorite extends Model
     public $timestamps = true;
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'id',
+    ];
+
+    /**
      * Get the song for the favorite item.
      */
     public function song()

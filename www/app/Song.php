@@ -21,6 +21,24 @@ class Song extends Model
     public $timestamps = true;
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'id',
+    ];
+
+    /**
+     * The attributes that should be append for arrays.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'favorite_count'
+    ];
+
+    /**
      * Get the favorites for the song.
      */
     public function favorites()
@@ -34,5 +52,22 @@ class Song extends Model
     public function category()
     {
         return $this->belongsTo('App\Category');
+    }
+
+    public function getCategoryIdAttribute($value)
+    {
+        $category = \App\Category::findOrFail($value);
+        return $category->uuid;
+    }
+
+    public function setCategoryIdAttribute($value)
+    {
+        $category = \App\Category::whereUuid($value)->firstOrFail();
+        $this->attributes['category_id'] = $category->id;
+    }
+
+    public function getFavoriteCountAttribute()
+    {
+        return $this->favorites()->count();
     }
 }

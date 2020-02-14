@@ -20,7 +20,6 @@ Route::prefix('users')->group(function () {
 Route::apiResource('categories', 'CategoryController');
 Route::apiResource('songs', 'SongController');
 Route::prefix('songs')->group(function () {
-    Route::get('{id}/favorites', 'SongController@favorites');
     Route::post('{id}/favorites', 'SongController@storeFavorites');
     Route::delete('{id}/favorites', 'SongController@deleteFavorites');
 });
