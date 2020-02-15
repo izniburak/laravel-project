@@ -13,14 +13,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::apiResource('users', 'UserController');
-Route::prefix('users')->group(function () {
-    Route::get('{song}/favorites', 'UserController@favorites');
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('users', 'UserController');
+    Route::prefix('users')->group(function () {
+        Route::get('{song}/favorites', 'UserController@favorites');
+    });
+    Route::apiResource('categories', 'CategoryController');
+    Route::apiResource('songs', 'SongController');
+    Route::prefix('songs')->group(function () {
+        Route::post('{song}/favorite', 'SongController@storeFavorites');
+        Route::delete('{song}/favorite', 'SongController@deleteFavorites');
+    });
 });
-Route::apiResource('categories', 'CategoryController');
-Route::apiResource('songs', 'SongController');
-Route::prefix('songs')->group(function () {
-    Route::post('{song}/favorite', 'SongController@storeFavorites');
-    Route::delete('{song}/favorite', 'SongController@deleteFavorites');
-});
-
