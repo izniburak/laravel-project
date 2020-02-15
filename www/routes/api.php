@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api')->group(function () {
+    Route::get('healt-check', 'MainController@healtCheck');
+    Route::get('info', 'MainController@info');
     Route::apiResource('users', 'UserController');
     Route::prefix('users')->group(function () {
         Route::get('{song}/favorites', 'UserController@favorites');

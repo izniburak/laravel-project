@@ -65,6 +65,8 @@ These are enpoint list for APIs:
 +-----------+-----------------------------------------+-----------------------------------+
 | Method    | URI                                     | Name                              | 
 +-----------+-----------------------------------------+-----------------------------------+
+| GET|HEAD  | api/healt-check                         |                                   | 
+| GET|HEAD  | api/info                                |                                   |
 | GET|HEAD  | api/categories                          | categories.index                  | 
 | POST      | api/categories                          | categories.store                  | 
 | DELETE    | api/categories/{category}               | categories.destroy                | 
